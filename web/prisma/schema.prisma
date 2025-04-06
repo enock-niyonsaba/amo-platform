@@ -1,0 +1,211 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  password          String?
+  role              Role      @default(USER)
+  status            UserStatus @default(ACTIVE)
+  phoneNumber       String?
+  profilePicture    String?
+  mustChangePassword Boolean  @default(false)
+  lastPasswordChange DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+  companies         Company[]
+  activities        Activity[]
+  licenses          License[]
+  desktopApps       DesktopApplication[]
+  desktopLogins     DesktopLogin[]
+  receipts          Receipt[]
+  alerts            Alert[]
+}
+
+model Company {
+  id            String    @id @default(cuid())
+  name          String
+  tinNumber     String    @unique
+  phoneNumber   String
+  email         String
+  address       String
+  sdcId         String
+  mrcNumber     String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  desktopApps   DesktopApplication[]
+  activities    Activity[]
+}
+
+model DesktopApplication {
+  id            String    @id @default(cuid())
+  status        DesktopAppStatus @default(PENDING)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  approvedAt    DateTime?
+  lastSyncAt    DateTime?
+  totalVat      Float     @default(0)
+  qrCodesScanned Int      @default(0)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id])
+  activities    Activity[]
+}
+
+model License {
+  id            String    @id @default(cuid())
+  key           String    @unique
+  status        LicenseStatus @default(ACTIVE)
+  maxUsers      Int
+  startDate     DateTime
+  endDate       DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  activities    Activity[]
+}
+
+model DesktopLogin {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  deviceId  String
+  lastLogin DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Receipt {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  amount      Float
+  items       Json
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Client {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  type        String
+  message     String
+  data        Json?
+  status      AlertStatus @default(PENDING)
+  response    String?
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  resolvedAt  DateTime?
+}
+
+model Activity {
+  id            String    @id @default(cuid())
+  type          ActivityType
+  description   String
+  oldValue      String?
+  newValue      String?
+  createdAt     DateTime  @default(now())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id])
+  desktopAppId  String?
+  desktopApp    DesktopApplication? @relation(fields: [desktopAppId], references: [id])
+  licenseId     String?
+  license       License?  @relation(fields: [licenseId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  LOCKED
+  DELETED
+  LICENSE_EXPIRED
+}
+
+enum DesktopAppStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum LicenseStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum ActivityType {
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  USER_RESTORED
+  COMPANY_CREATED
+  COMPANY_UPDATED
+  COMPANY_DELETED
+  COMPANY_RESTORED
+  DESKTOP_APP_REQUESTED
+  DESKTOP_APP_APPROVED
+  DESKTOP_APP_REJECTED
+  DESKTOP_APP_SUSPENDED
+  LICENSE_CREATED
+  LICENSE_UPDATED
+  LICENSE_EXPIRED
+  LICENSE_REVOKED
+  SYNC_COMPLETED
+  SYNC_FAILED
+  QR_CODE_SCANNED
+  VAT_UPDATED
+}
+
+enum AlertStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+} 
