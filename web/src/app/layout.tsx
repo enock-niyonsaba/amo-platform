@@ -1,17 +1,12 @@
-import type { Metadata } from "next";
+'use client';
 import { Inter } from "next/font/google";
-import "./globals.css";
+
+import { SessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "AMO Platform",
-  description: "Your all-in-one solution for modern application monitoring and optimization",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -27,7 +22,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SessionProvider>
+            {children}
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

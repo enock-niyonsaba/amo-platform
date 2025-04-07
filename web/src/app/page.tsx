@@ -55,61 +55,46 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div className="min-h-screen bg-[#0a0f1c]">
       {/* Navigation */}
-      <nav className="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-50">
+      <nav className="fixed w-full bg-[#0a0f1c]/80 backdrop-blur-md z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link href="/">
-              <motion.div
-                className="flex items-center gap-2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  AMO
-                </span>
-              </motion.div>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold text-white">AMO</span>
             </Link>
 
-            <div className="flex items-center gap-6">
-              <Link href="/features" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+            <div className="flex items-center gap-8">
+              <Link href="/features" className="text-gray-300 hover:text-white transition-colors">
                 Features
               </Link>
-              <Link href="/about" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+              <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
                 About
               </Link>
-              <Link href="/pricing" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
-                Pricing
-              </Link>
-              <Link href="/contact" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+              <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                 Contact
               </Link>
 
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
                 aria-label="Toggle theme"
               >
                 {isDark ? (
-                  <Sun className="w-5 h-5" />
+                  <Sun className="w-5 h-5 text-gray-300" />
                 ) : (
-                  <Moon className="w-5 h-5" />
+                  <Moon className="w-5 h-5 text-gray-300" />
                 )}
               </button>
 
               <Link href="/login">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                >
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors">
                   <LogIn className="w-4 h-4" />
                   Login
-                </motion.button>
+                </button>
               </Link>
             </div>
           </div>
@@ -119,48 +104,32 @@ export default function Home() {
       <main className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Section */}
-          <motion.section
-            className="text-center mb-24"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="text-center mb-24">
+            <h1 className="text-6xl font-bold mb-6 text-blue-600">
               Welcome to AMO Platform
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-400 mb-12 max-w-3xl mx-auto">
               Your all-in-one solution for modern application monitoring and optimization.
               Experience seamless tracking, real-time analytics, and powerful insights.
             </p>
             <div className="flex justify-center gap-4">
               <Link href="/get-started">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-shadow"
-                >
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg flex items-center gap-2 transition-colors">
                   Get Started
-                  <ChevronRight className="w-4 h-4" />
-                </motion.button>
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </Link>
               <Link href="/learn-more">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gray-200 dark:bg-gray-700 px-6 py-3 rounded-lg flex items-center gap-2 hover:shadow-[0_0_15px_rgba(156,163,175,0.5)] dark:hover:shadow-[0_0_15px_rgba(55,65,81,0.5)] transition-shadow"
-                >
+                <button className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-lg flex items-center gap-2 transition-colors">
                   Learn More
-                  <ChevronRight className="w-4 h-4" />
-                </motion.button>
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </Link>
             </div>
-          </motion.section>
+          </div>
 
-          {/* Features Section */}
-          <motion.section
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
             {[
               {
                 icon: Activity,
@@ -192,69 +161,69 @@ export default function Home() {
                 title: "Detailed Reports",
                 description: "Generate comprehensive reports with actionable insights."
               }
-            ].map((feature, index) => (
-              <motion.div
+            ].map((feature) => (
+              <div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-[0_0_25px_rgba(37,99,235,0.2)] dark:hover:shadow-[0_0_25px_rgba(37,99,235,0.1)] transition-all duration-300 hover:-translate-y-1 group"
+                className="bg-[#151b2b] p-6 rounded-xl hover:bg-[#1a2137] transition-colors"
               >
-                <feature.icon className="w-12 h-12 text-blue-600 mb-4 group-hover:text-blue-500 transition-colors" />
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-600 transition-colors">
+                <div className="w-12 h-12 bg-blue-600/10 rounded-lg flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3 text-white">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <p className="text-gray-400">
                   {feature.description}
                 </p>
-              </motion.div>
+              </div>
             ))}
-          </motion.section>
+          </div>
 
           {/* About Section */}
-          <motion.section
-            className="text-center mb-24"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h2 className="text-3xl font-bold mb-8">About AMO</h2>
+          <div className="text-center mb-32">
+            <h2 className="text-4xl font-bold mb-12 text-white">About AMO</h2>
             <div className="max-w-3xl mx-auto">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 p-1">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-                    <User className="w-12 h-12 text-blue-600" />
+              <div className="flex items-center justify-center mb-8">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur opacity-75"></div>
+                  <div className="relative w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-1">
+                    <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                      <User className="w-16 h-16 text-blue-500" />
+                    </div>
                   </div>
                 </div>
               </div>
-              <h3 className="text-2xl font-semibold mb-2">Enock NIYONSABA</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">AMO Founder</p>
-              <div className="flex justify-center gap-4 text-gray-600 dark:text-gray-300">
-                <a href="mailto:contact@amo.com" className="flex items-center gap-2 hover:text-blue-600">
-                  <Mail className="w-5 h-5" />
+              <h3 className="text-3xl font-semibold mb-3 text-white">Enock NIYONSABA</h3>
+              <p className="text-gray-400 mb-8 text-lg">AMO Founder</p>
+              <div className="flex justify-center gap-8 text-gray-400">
+                <a href="mailto:contact@amo.com" className="flex items-center gap-3 hover:text-blue-400 transition-colors group">
+                  <div className="p-3 bg-gray-800 rounded-lg group-hover:bg-gray-700 transition-colors">
+                    <Mail className="w-5 h-5" />
+                  </div>
                   contact@amo.com
                 </a>
-                <a href="tel:+1234567890" className="flex items-center gap-2 hover:text-blue-600">
-                  <Phone className="w-5 h-5" />
+                <a href="tel:+1234567890" className="flex items-center gap-3 hover:text-blue-400 transition-colors group">
+                  <div className="p-3 bg-gray-800 rounded-lg group-hover:bg-gray-700 transition-colors">
+                    <Phone className="w-5 h-5" />
+                  </div>
                   +1 (234) 567-890
                 </a>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
+                <div className="flex items-center gap-3 group">
+                  <div className="p-3 bg-gray-800 rounded-lg group-hover:bg-gray-700 transition-colors">
+                    <MapPin className="w-5 h-5" />
+                  </div>
                   Kigali, Rwanda
                 </div>
               </div>
             </div>
-          </motion.section>
+          </div>
 
           {/* Contact Form Section */}
-          <motion.section
-            className="max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h2 className="text-3xl font-bold text-center mb-8">Get in Touch</h2>
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-center mb-12 text-white">Get in Touch</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-2">
+                <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-400">
                   Name
                 </label>
                 <input
@@ -263,12 +232,12 @@ export default function Home() {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition-shadow"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-2">
+                <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-400">
                   Email
                 </label>
                 <input
@@ -277,12 +246,12 @@ export default function Home() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition-shadow"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                <label htmlFor="subject" className="block text-sm font-medium mb-2 text-gray-400">
                   Subject
                 </label>
                 <input
@@ -291,12 +260,12 @@ export default function Home() {
                   name="subject"
                   value={formData.subject}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition-shadow"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium mb-2">
+                <label htmlFor="message" className="block text-sm font-medium mb-2 text-gray-400">
                   Message
                 </label>
                 <textarea
@@ -305,21 +274,21 @@ export default function Home() {
                   value={formData.message}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full px-4 py-2 rounded-lg border dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition-shadow"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow resize-none"
                   required
                 />
               </div>
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-shadow"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-4 rounded-xl flex items-center justify-center gap-3 hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] transition-shadow font-medium"
               >
                 Send Message
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
               </motion.button>
             </form>
-          </motion.section>
+          </div>
         </div>
       </main>
 
