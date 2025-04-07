@@ -1,14 +1,39 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, User, Mail, Phone, MapPin, CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type FormStep = 'userType' | 'existingUser' | 'newUser' | 'companyInfo' | 'success';
 
+interface FormData {
+  // User Type
+  userType: string;
+  // Existing User
+  existingEmail: string;
+  existingPassword: string;
+  // New User
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  // Company Info
+  companyName: string;
+  companyEmail: string;
+  companyPhone: string;
+  companyAddress: string;
+  companySize: string;
+  industry: string;
+  tinNumber: string;
+  sdcId: string;
+  mrcNumber: string;
+}
+
 export default function GetStartedPage() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<FormStep>('userType');
   const [isExistingUser, setIsExistingUser] = useState<boolean>(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     // User Type
     userType: '',
     // Existing User
@@ -26,6 +51,9 @@ export default function GetStartedPage() {
     companyAddress: '',
     companySize: '',
     industry: '',
+    tinNumber: '',
+    sdcId: '',
+    mrcNumber: '',
   });
 
   const handleUserTypeSelect = (isExisting: boolean) => {
@@ -33,11 +61,43 @@ export default function GetStartedPage() {
     setCurrentStep(isExisting ? 'existingUser' : 'newUser');
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 'newUser' || currentStep === 'existingUser') {
       setCurrentStep('companyInfo');
     } else if (currentStep === 'companyInfo') {
-      setCurrentStep('success');
+      try {
+        const response = await fetch('/api/desktop-applications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user: {
+              name: `${formData.firstName} ${formData.lastName}`,
+              email: formData.email,
+              phoneNumber: formData.phone,
+            },
+            company: {
+              name: formData.companyName,
+              tinNumber: formData.tinNumber,
+              phoneNumber: formData.companyPhone,
+              email: formData.companyEmail,
+              address: formData.companyAddress,
+              sdcId: formData.sdcId,
+              mrcNumber: formData.mrcNumber,
+            },
+          }),
+        });
+
+        if (response.ok) {
+          setCurrentStep('success');
+        } else {
+          throw new Error('Failed to submit application');
+        }
+      } catch (error) {
+        console.error('Error submitting application:', error);
+        // Handle error (show error message to user)
+      }
     }
   };
 
@@ -49,7 +109,7 @@ export default function GetStartedPage() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -95,7 +155,7 @@ export default function GetStartedPage() {
                   <div className="text-left">
                     <h3 className="font-semibold">New User</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      I'm new to AMO platform
+                      I&apos;m new to AMO platform
                     </p>
                   </div>
                 </div>
@@ -280,12 +340,46 @@ export default function GetStartedPage() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium mb-1">TIN Number</label>
+                <input
+                  type="text"
+                  name="tinNumber"
+                  value={formData.tinNumber}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="Enter TIN Number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">SDC ID</label>
+                <input
+                  type="text"
+                  name="sdcId"
+                  value={formData.sdcId}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="Enter SDC ID"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">MRC Number</label>
+                <input
+                  type="text"
+                  name="mrcNumber"
+                  value={formData.mrcNumber}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="Enter MRC Number"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Company Size</label>
                 <select
                   name="companySize"
                   value={formData.companySize}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border rounded-lg"
+                  aria-label="Select company size"
                 >
                   <option value="">Select company size</option>
                   <option value="1-10">1-10 employees</option>
@@ -302,6 +396,7 @@ export default function GetStartedPage() {
                   value={formData.industry}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border rounded-lg"
+                  aria-label="Select industry"
                 >
                   <option value="">Select industry</option>
                   <option value="technology">Technology</option>
@@ -345,10 +440,10 @@ export default function GetStartedPage() {
               Thank you for your application. Our team will review it and get back to you shortly.
             </p>
             <button
-              onClick={() => setCurrentStep('userType')}
+              onClick={() => router.push('/dashboard')}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg"
             >
-              Start New Application
+              Go to Dashboard
             </button>
           </motion.div>
         );

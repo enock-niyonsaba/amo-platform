@@ -1,12 +1,13 @@
-'use client';
 import { Inter } from "next/font/google";
-
-import { SessionProvider } from "@/components/session-provider";
-import { ThemeProvider } from "@/components/theme-provider";
-
+import { ClientLayout } from "@/components/client-layout";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "AMO Platform",
+  description: "Advanced Monitoring and Optimization Platform",
+};
 
 export default function RootLayout({
   children,
@@ -16,16 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProvider>
-            {children}
-          </SessionProvider>
-        </ThemeProvider>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
