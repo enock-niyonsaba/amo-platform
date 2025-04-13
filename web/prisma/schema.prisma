@@ -33,8 +33,6 @@ model User {
   desktopLogins     DesktopLogin[]
   receipts          Receipt[]
   alerts            Alert[]
-  company           Company?
-  applications      DesktopApplication[]
 }
 
 model Company {

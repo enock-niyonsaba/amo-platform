@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "AMO Platform",
   description: "Your all-in-one solution for modern application monitoring and optimization",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
   keywords: [
     'business management',
@@ -12,5 +12,13 @@ export const metadata: Metadata = {
     'sales monitoring',
     'business analytics',
     'performance optimization',
+    'Enock NIYONSABA',
+    'Rwanda Business',
+  ],
+  authors: [
+    {
+      name: "Enock NIYONSABA",
+      url: "http://enock-portfolio.vercel.app/",
+    },
   ],
 }; 

@@ -1,8 +1,7 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-import { X, CheckCircle2, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X, CheckCircle2, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
 type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -98,6 +97,7 @@ export function useToast() {
     error,
     warning,
     info,
+    removeToast,
   };
 }
 
