@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 import { useToast } from '@/components/toast';
@@ -103,43 +104,32 @@ export default function GetStartedPage() {
     } else if (currentStep === 'existingUser') {
       setIsLoading(true);
       try {
-        // Sign in the user
-        const signInResponse = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.existingEmail,
-            password: formData.existingPassword,
-          }),
+        // Sign in the user using NextAuth
+        const result = await signIn('credentials', {
+          email: formData.existingEmail,
+          password: formData.existingPassword,
+          redirect: false,
         });
 
-        const data = await signInResponse.json();
-
-        if (!signInResponse.ok) {
-          // Handle specific error cases
-          if (signInResponse.status === 401) {
-            error('Invalid credentials. Please check your email and password and try again.');
-            // Clear password field for security
-            setFormData(prev => ({ ...prev, existingPassword: '' }));
-          } else if (signInResponse.status === 400) {
-            error('Please provide both email and password');
-          } else {
-            error(data.error || 'Failed to sign in. Please try again later.');
-          }
+        if (result?.error) {
+          error('Invalid credentials. Please check your email and password and try again.');
+          // Clear password field for security
+          setFormData(prev => ({ ...prev, existingPassword: '' }));
           return;
         }
 
+        // If we get here, sign in was successful
         success('Signed in successfully! Redirecting to dashboard...');
+        
         // Add a small delay before redirect to show the success message
         setTimeout(() => {
           router.push('/dashboard');
         }, 1500);
       } catch (err) {
-        console.error('Error:', err);
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred while signing in';
-        error(errorMessage);
+        console.error('Sign in error:', err);
+        error('An error occurred while signing in. Please try again later.');
+        // Clear password field for security
+        setFormData(prev => ({ ...prev, existingPassword: '' }));
       } finally {
         setIsLoading(false);
       }

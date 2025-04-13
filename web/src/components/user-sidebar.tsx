@@ -1,60 +1,54 @@
 'use client';
-
+import { motion } from 'framer-motion';
+import { 
+  Home,
+  Receipt,
+  QrCode,
+  FileText,
+  Settings,
+  LogOut,
+  User
+} from 'lucide-react';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import {
-  LayoutDashboard,
-  ClipboardList,
-  Settings,
-  Receipt,
-  Scan,
-  Activity,
-  MessageSquare,
-  FileText,
-  User,
-} from 'lucide-react';
 
 const userLinks = [
   {
+    name: 'Overview',
     href: '/dashboard',
-    label: 'Overview',
-    icon: LayoutDashboard,
+    icon: Home,
+    color: 'text-blue-500',
   },
   {
-    href: '/dashboard/application',
-    label: 'Company Application',
-    icon: FileText,
-  },
-  {
+    name: 'Receipts',
     href: '/dashboard/receipts',
-    label: 'Receipts',
     icon: Receipt,
+    color: 'text-green-500',
   },
   {
-    href: '/dashboard/vat',
-    label: 'VAT Records',
-    icon: ClipboardList,
+    name: 'Scan Code',
+    href: '/dashboard/scan',
+    icon: QrCode,
+    color: 'text-purple-500',
   },
   {
-    href: '/dashboard/scans',
-    label: 'Scanned Codes',
-    icon: Scan,
+    name: 'Reports',
+    href: '/dashboard/reports',
+    icon: FileText,
+    color: 'text-yellow-500',
   },
   {
-    href: '/dashboard/activities',
-    label: 'Recent Activities',
-    icon: Activity,
+    name: 'Profile',
+    href: '/dashboard/profile',
+    icon: User,
+    color: 'text-pink-500',
   },
   {
-    href: '/dashboard/messages',
-    label: 'Messages',
-    icon: MessageSquare,
-  },
-  {
+    name: 'Settings',
     href: '/dashboard/settings',
-    label: 'Settings',
     icon: Settings,
+    color: 'text-gray-400',
   },
 ];
 
@@ -62,33 +56,51 @@ export function UserSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col gap-2">
-      <div className="flex h-14 items-center border-b px-4">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <User className="h-6 w-6" />
-          <span className="font-semibold">User Dashboard</span>
+    <motion.div
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      className="flex h-full flex-col bg-gray-900 p-4"
+    >
+      <div className="mb-8 flex items-center justify-center">
+        <Link href="/dashboard">
+        <div className="rounded-lg bg-blue-500/10 p-3 flex items-center gap-2">
+            <User className="h-6 w-6 text-blue-500" />
+            <span className="font-semibold text-lg">User Account</span>
+          </div>
+          
+        
         </Link>
       </div>
-      <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start gap-2 px-2">
-          {userLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
-                  pathname === link.href ? 'bg-accent' : 'transparent'
-                )}
-              >
-                <Icon className="mr-2 h-4 w-4" />
-                <span>{link.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-    </div>
+
+      <nav className="flex-1 space-y-2">
+        {userLinks.map((link) => {
+          const Icon = link.icon;
+          const isActive = pathname === link.href;
+
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={`flex items-center space-x-3 rounded-lg px-3 py-2 transition-colors ${
+                isActive
+                  ? 'bg-gray-800 text-white'
+                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+              }`}
+            >
+              <Icon className={`h-5 w-5 ${link.color}`} />
+              <span>{link.name}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <button
+        onClick={() => signOut({ callbackUrl: '/login' })}
+        className="flex items-center space-x-3 rounded-lg px-3 py-2 text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
+      >
+        <LogOut className="h-5 w-5 text-red-500" />
+        <span>Sign Out</span>
+      </button>
+    </motion.div>
   );
 } 

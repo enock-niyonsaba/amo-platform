@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { signIn } from 'next-auth/react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
     // Validate input
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Email and password are required' },
         { status: 400 }
       );
     }
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     // Verify password
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.password || '');
 
     if (!isValid) {
       return NextResponse.json(
@@ -40,23 +41,19 @@ export async function POST(req: Request) {
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
-    // Sign in with NextAuth
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (result?.error) {
+    // Create session
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
       return NextResponse.json(
-        { error: result.error },
-        { status: 401 }
+        { error: 'Failed to create session' },
+        { status: 500 }
       );
     }
 
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
-    console.error('Error in signin route:', error);
+    console.error('Sign in error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
