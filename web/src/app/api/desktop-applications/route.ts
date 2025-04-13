@@ -1,33 +1,84 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-export async function GET() {
+export async function POST(req: Request) {
+  try {
+    const data = await req.json();
+    const { user, company } = data;
+
+    // Create or update user
+    const createdUser = await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.name,
+        phoneNumber: user.phoneNumber,
+      },
+      create: {
+        email: user.email,
+        name: user.name,
+        phoneNumber: user.phoneNumber,
+        role: 'USER',
+      },
+    });
+
+    // Create company
+    const createdCompany = await prisma.company.create({
+      data: {
+        name: company.name,
+        tinNumber: company.tinNumber,
+        phoneNumber: company.phoneNumber,
+        email: company.email,
+        address: company.address,
+        sdcId: company.sdcId,
+        mrcNumber: company.mrcNumber,
+        userId: createdUser.id,
+      },
+    });
+
+    // Create desktop application
+    const application = await prisma.desktopApplication.create({
+      data: {
+        userId: createdUser.id,
+        companyId: createdCompany.id,
+        status: 'PENDING',
+      },
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      application,
+      user: createdUser,
+      company: createdCompany
+    });
+  } catch (error) {
+    console.error('Error creating desktop application:', error);
+    return NextResponse.json(
+      { error: 'Failed to create desktop application' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session?.user?.email) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.user?.email },
     });
 
     if (!user || user.role !== 'ADMIN') {
-      return new NextResponse('Forbidden', { status: 403 });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const applications = await prisma.desktopApplication.findMany({
       include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            phoneNumber: true,
-          },
-        },
+        user: true,
         company: true,
       },
       orderBy: {
@@ -38,6 +89,9 @@ export async function GET() {
     return NextResponse.json(applications);
   } catch (error) {
     console.error('Error fetching desktop applications:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch desktop applications' },
+      { status: 500 }
+    );
   }
 } 

@@ -1,7 +1,8 @@
 'use client';
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 type FormStep = 'userType' | 'existingUser' | 'newUser' | 'companyInfo' | 'success';
@@ -17,6 +18,8 @@ interface FormData {
   lastName: string;
   email: string;
   phone: string;
+  password: string;
+  confirmPassword: string;
   // Company Info
   companyName: string;
   companyEmail: string;
@@ -33,6 +36,7 @@ export default function GetStartedPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<FormStep>('userType');
   const [isExistingUser, setIsExistingUser] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     // User Type
     userType: '',
@@ -44,6 +48,8 @@ export default function GetStartedPage() {
     lastName: '',
     email: '',
     phone: '',
+    password: '',
+    confirmPassword: '',
     // Company Info
     companyName: '',
     companyEmail: '',
@@ -55,18 +61,66 @@ export default function GetStartedPage() {
     sdcId: '',
     mrcNumber: '',
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleUserTypeSelect = (isExisting: boolean) => {
     setIsExistingUser(isExisting);
     setCurrentStep(isExisting ? 'existingUser' : 'newUser');
   };
 
+  const validateForm = () => {
+    if (currentStep === 'newUser') {
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.password || !formData.confirmPassword) {
+        setError('Please fill in all fields');
+        return false;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        return false;
+      }
+    } else if (currentStep === 'companyInfo') {
+      if (!formData.companyName || !formData.companyEmail || !formData.companyPhone || 
+          !formData.companyAddress || !formData.tinNumber || !formData.sdcId || !formData.mrcNumber) {
+        setError('Please fill in all required fields');
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleNext = async () => {
+    setError(null);
+    
+    if (!validateForm()) {
+      return;
+    }
+
     if (currentStep === 'newUser' || currentStep === 'existingUser') {
       setCurrentStep('companyInfo');
     } else if (currentStep === 'companyInfo') {
+      setIsLoading(true);
       try {
-        const response = await fetch('/api/desktop-applications', {
+        // First, register the user
+        const userResponse = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            password: formData.password,
+            phoneNumber: formData.phone,
+          }),
+        });
+
+        if (!userResponse.ok) {
+          const errorData = await userResponse.json();
+          throw new Error(errorData.error || 'Failed to register user');
+        }
+
+        // Then, create the company and application
+        const applicationResponse = await fetch('/api/desktop-applications', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -85,23 +139,29 @@ export default function GetStartedPage() {
               address: formData.companyAddress,
               sdcId: formData.sdcId,
               mrcNumber: formData.mrcNumber,
+              size: formData.companySize,
+              industry: formData.industry,
             },
           }),
         });
 
-        if (response.ok) {
-          setCurrentStep('success');
-        } else {
-          throw new Error('Failed to submit application');
+        if (!applicationResponse.ok) {
+          const errorData = await applicationResponse.json();
+          throw new Error(errorData.error || 'Failed to submit application');
         }
+
+        setCurrentStep('success');
       } catch (error) {
-        console.error('Error submitting application:', error);
-        // Handle error (show error message to user)
+        console.error('Error:', error);
+        setError(error instanceof Error ? error.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleBack = () => {
+    setError(null);
     if (currentStep === 'companyInfo') {
       setCurrentStep(isExistingUser ? 'existingUser' : 'newUser');
     } else if (currentStep === 'existingUser' || currentStep === 'newUser') {
@@ -268,6 +328,28 @@ export default function GetStartedPage() {
                   placeholder="+1 (234) 567-890"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="Create a password"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Confirm Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg"
+                  placeholder="Confirm your password"
+                />
+              </div>
             </div>
             <div className="flex justify-between">
               <button
@@ -417,9 +499,17 @@ export default function GetStartedPage() {
               </button>
               <button
                 onClick={handleNext}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                disabled={isLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2"
               >
-                Submit Application
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Application'
+                )}
               </button>
             </div>
           </motion.div>
@@ -459,6 +549,11 @@ export default function GetStartedPage() {
             Complete the form below to apply for the AMO desktop application
           </p>
         </div>
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
         {renderStep()}
       </div>
     </div>

@@ -33,6 +33,8 @@ model User {
   desktopLogins     DesktopLogin[]
   receipts          Receipt[]
   alerts            Alert[]
+  company           Company?
+  applications      DesktopApplication[]
 }
 
 model Company {
@@ -42,15 +44,15 @@ model Company {
   phoneNumber   String
   email         String
   address       String
-  sdcId         String
-  mrcNumber     String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
-  userId        String
+  sdcId         String?
+  mrcNumber     String?
+  userId        String    @unique
   user          User      @relation(fields: [userId], references: [id])
   desktopApps   DesktopApplication[]
   activities    Activity[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
 }
 
 model DesktopApplication {
@@ -157,6 +159,7 @@ model Activity {
 
 enum Role {
   USER
+  COMPANY_ADMIN
   ADMIN
 }
 
