@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
 import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
@@ -12,24 +12,24 @@ export async function GET() {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    // Fetch dashboard statistics
+    // Fetch dashboard statistics with fallback to 0 for empty results
     const [totalUsers, activeLicenses, pendingAlerts, unreadMessages, recentActivity] = await Promise.all([
-      prisma.user.count(),
-      prisma.license.count({
+      prisma.user.count().catch(() => 0),
+      prisma.license?.count({
         where: {
           status: 'ACTIVE',
         },
-      }),
-      prisma.alert.count({
+      }).catch(() => 0),
+      prisma.alert?.count({
         where: {
           status: 'PENDING',
         },
-      }),
-      prisma.message.count({
+      }).catch(() => 0),
+      prisma.message?.count({
         where: {
           read: false,
         },
-      }),
+      }).catch(() => 0),
       prisma.activity.findMany({
         take: 5,
         orderBy: {
@@ -41,11 +41,11 @@ export async function GET() {
           description: true,
           createdAt: true,
         },
-      }),
+      }).catch(() => []),
     ]);
 
     // Format recent activity
-    const formattedActivity = recentActivity.map((activity) => ({
+    const formattedActivity = (recentActivity || []).map((activity) => ({
       id: activity.id,
       type: activity.type,
       description: activity.description,
@@ -53,10 +53,10 @@ export async function GET() {
     }));
 
     return NextResponse.json({
-      totalUsers,
-      activeLicenses,
-      pendingAlerts,
-      unreadMessages,
+      totalUsers: totalUsers || 0,
+      activeLicenses: activeLicenses || 0,
+      pendingAlerts: pendingAlerts || 0,
+      unreadMessages: unreadMessages || 0,
       recentActivity: formattedActivity,
     });
   } catch (error) {

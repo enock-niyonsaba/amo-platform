@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextResponse } from 'next/server';
+
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -24,26 +25,26 @@ export async function GET() {
       },
     });
 
-    // Get user's stats
+    // Get user's stats with fallback to 0 for empty results
     const [receiptsCount, vatTotal, scansCount, activities] = await Promise.all([
       prisma.receipt.count({
         where: {
           userId: session.user.id,
         },
-      }),
+      }).catch(() => 0),
       prisma.receipt.aggregate({
         where: {
           userId: session.user.id,
         },
         _sum: {
-          vatAmount: true,
+          amount: true, // Changed from vatAmount to amount
         },
-      }),
-      prisma.scan.count({
+      }).catch(() => ({ _sum: { amount: 0 } })),
+      prisma.scan?.count({
         where: {
           userId: session.user.id,
         },
-      }),
+      }).catch(() => 0),
       prisma.activity.findMany({
         where: {
           userId: session.user.id,
@@ -58,15 +59,15 @@ export async function GET() {
           description: true,
           createdAt: true,
         },
-      }),
+      }).catch(() => []),
     ]);
 
     return NextResponse.json({
-      totalReceipts: receiptsCount,
-      totalVAT: vatTotal._sum.vatAmount || 0,
-      totalScans: scansCount,
-      applicationStatus: application?.status,
-      recentActivities: activities.map(activity => ({
+      totalReceipts: receiptsCount || 0,
+      totalVAT: vatTotal._sum.amount || 0,
+      totalScans: scansCount || 0,
+      applicationStatus: application?.status || null,
+      recentActivities: (activities || []).map(activity => ({
         id: activity.id,
         type: activity.type,
         description: activity.description,

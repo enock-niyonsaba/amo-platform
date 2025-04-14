@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 import { hash, compare } from 'bcryptjs';
+import { getServerSession } from 'next-auth';
+import { NextResponse } from 'next/server';
+
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     // Verify current password
-    const isValidPassword = await compare(currentPassword, user.password || '');
+    const isValidPassword = await compare(currentPassword, user.password ?? '');
     if (!isValidPassword) {
       return new NextResponse('Invalid current password', { status: 400 });
     }

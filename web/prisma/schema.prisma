@@ -33,6 +33,7 @@ model User {
   desktopLogins     DesktopLogin[]
   receipts          Receipt[]
   alerts            Alert[]
+  scans             Scan[]
 }
 
 model Company {
@@ -153,6 +154,14 @@ model Activity {
   desktopApp    DesktopApplication? @relation(fields: [desktopAppId], references: [id])
   licenseId     String?
   license       License?  @relation(fields: [licenseId], references: [id])
+}
+
+model Scan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
