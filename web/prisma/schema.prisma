@@ -182,6 +182,7 @@ enum DesktopAppStatus {
   APPROVED
   REJECTED
   SUSPENDED
+  LICENSE_EXPIRED
 }
 
 enum LicenseStatus {

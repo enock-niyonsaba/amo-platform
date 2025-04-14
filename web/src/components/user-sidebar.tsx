@@ -8,7 +8,8 @@ import {
   Settings,
   LogOut,
   User,
-  RefreshCcw
+  RefreshCcw,
+  Building2
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
@@ -20,6 +21,12 @@ const userLinks = [
     href: '/dashboard',
     icon: Home,
     color: 'text-blue-500',
+  },
+  {
+    name: 'Company',
+    href: '/dashboard/company',
+    icon: Building2,
+    color: 'text-indigo-500',
   },
   {
     name: 'Receipts',
